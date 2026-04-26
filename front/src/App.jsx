@@ -1,28 +1,78 @@
 import { useState, useEffect } from "react";
+import { generatePassword, isStrongPassword, injectPasswordToPage } from "./passwordHelpers";
 
 function App() {
-  const [serverData, setServerData] = useState("טוען נתונים...");
+  // --- States (ניהול זיכרון האפליקציה) ---
+  const [currentPassword, setCurrentPassword] = useState(""); // שומר את הסיסמה שנוצרה
+  const [serverStatus, setServerStatus] = useState("מתחבר לשרת..."); // שומר את מצב החיבור ל-Backend
 
-  const fetchData = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/data");
-      const data = await response.json();
-      setServerData(data.message);
-    } catch (error) {
-      setServerData("שגיאה בחיבור לשרת");
-      console.error(error);
+  // --- Side Effects (פעולות שקורות כשהתוסף נפתח) ---
+  useEffect(() => {
+    // בדיקה אם השרת חי ומגיב
+    fetch("http://localhost:3000/api/data")
+      .then((res) => res.json())
+      .then((data) => setServerStatus("מחובר לשרת: " + (data.message || "פעיל")))
+      .catch(() => setServerStatus("שגיאה בחיבור לשרת (וודא שה-Node רץ)"));
+  }, []);
+
+  // --- Handlers (הפונקציות שמגיבות ללחיצות כפתור) ---
+
+  // פונקציה לייצור סיסמה חזקה
+  const handleGenerateClick = () => {
+    const newPass = generatePassword();
+    // וולידציה - מוודאים שהסיסמה באמת חזקה לפני שמציגים אותה
+    if (isStrongPassword(newPass)) {
+      setCurrentPassword(newPass);
+    } else {
+      alert("שגיאה פנימית בייצור סיסמה, נסה שוב");
     }
   };
 
+  // פונקציה להזרקת הסיסמה ישירות לשדה באתר
+  const handleInjectClick = () => {
+    if (!currentPassword) {
+      alert("קודם תייצר סיסמה!");
+      return;
+    }
+    injectPasswordToPage(currentPassword);
+  };
+
+  // --- UI (מה שהמשתמש רואה) ---
   return (
-    <div style={{ padding: "20px", textAlign: "center" }}>
-      <h1>Extension + Node.js</h1>
-      <div className="card">
-        <p>
-          תגובה מהשרת: <strong>{serverData}</strong>
-        </p>
-        <button onClick={fetchData}>משוך נתונים עכשיו</button>
+    <div style={{ padding: "15px", textAlign: "center", width: "300px", fontFamily: "Arial", direction: "rtl" }}>
+      <h2 style={{ color: "#333", marginBottom: "5px" }}>Password Manager</h2>
+      
+      {/* תצוגת סטטוס שרת */}
+      <div style={{ fontSize: "11px", marginBottom: "15px", color: serverStatus.includes("שגיאה") ? "#ff4d4d" : "#4caf50" }}>
+        {serverStatus}
       </div>
+
+      {/* תיבת הצגת הסיסמה */}
+      <div style={{ backgroundColor: "#f4f4f4", padding: "15px", borderRadius: "8px", border: "1px solid #ddd", marginBottom: "15px" }}>
+        <p style={{ margin: "0 0 5px 0", fontSize: "12px", color: "#666" }}>סיסמה שנוצרה:</p>
+        <strong style={{ fontSize: "20px", letterSpacing: "2px", color: "#222", wordBreak: "break-all" }}>
+          {currentPassword || "--------"}
+        </strong>
+      </div>
+
+      {/* כפתורי פעולה */}
+      <button 
+        onClick={handleGenerateClick} 
+        style={{ backgroundColor: "#4CAF50", color: "white", width: "100%", padding: "12px", border: "none", borderRadius: "5px", cursor: "pointer", marginBottom: "10px", fontWeight: "bold", fontSize: "14px" }}
+      >
+        ייצר סיסמה חזקה
+      </button>
+
+      <button 
+        onClick={handleInjectClick} 
+        style={{ backgroundColor: "#2196F3", color: "white", width: "100%", padding: "12px", border: "none", borderRadius: "5px", cursor: "pointer", fontWeight: "bold", fontSize: "14px" }}
+      >
+        הזרק סיסמה לדף
+      </button>
+
+      <p style={{ fontSize: "10px", marginTop: "15px", color: "#999" }}>
+        * הסיסמה תישמר אוטומטית בשרת בעת לחיצה על כפתור התחברות באתר.
+      </p>
     </div>
   );
 }
