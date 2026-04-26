@@ -1,15 +1,15 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { crx } from "@crxjs/vite-plugin";
-import manifest from "./manifest.json";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
+// הגדרה פשוטה ויציבה לתוסף כרום
 export default defineConfig({
-  server: {
-    port: 5173,
-    strictPort: true,
-    hmr: {
-      host: "localhost",
+  plugins: [react()],
+  build: {
+    rollupOptions: {
+      input: {
+        // הכניסה הראשית היא דף הפופ-אפ של התוסף
+        main: 'index.html',
+      },
     },
   },
-  plugins: [react(), crx({ manifest })],
-});
+})
