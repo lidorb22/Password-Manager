@@ -40,6 +40,11 @@ router.post("/create", async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+    if (
+      user.accounts.some((acc) => acc.site == site && acc.username == username)
+    ) {
+      return res.status(400).json({ error: "Account already exists" });
+    }
     const updatedAccount = await setNewAccount(
       user,
       site,
