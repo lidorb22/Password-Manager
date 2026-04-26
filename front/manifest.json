@@ -1,9 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "Password Manager Extension",
+  "name": "My Extension",
   "version": "1.0.0",
   "action": {
     "default_popup": "index.html"
+  },
+  "permissions": ["scripting", "activeTab", "tabs"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' http://localhost:5173; object-src 'self'"
   },
   "background": {
     "service_worker": "background.js",
@@ -15,12 +19,5 @@
       "js": ["content.js"]
     }
   ],
-  "permissions": [
-    "scripting",
-    "activeTab",
-    "tabs"
-  ],
-  "host_permissions": [
-    "http://localhost:3000/*"
-  ]
+  "host_permissions": ["http://localhost:5173/*", "http://localhost:3000/*"]
 }
