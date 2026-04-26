@@ -17,7 +17,10 @@ export const generatePassword = () => {
     password += all[Math.floor(Math.random() * all.length)];
   }
 
-  return password.split('').sort(() => 0.5 - Math.random()).join('');
+  return password
+    .split("")
+    .sort(() => 0.5 - Math.random())
+    .join("");
 };
 
 export const isStrongPassword = (password) => {
@@ -40,7 +43,7 @@ export const injectPasswordToPage = async (passwordToInject) => {
         const passwordInput = document.querySelector('input[type="password"]');
         if (passwordInput) {
           passwordInput.value = pass;
-          passwordInput.dispatchEvent(new Event('input', { bubbles: true }));
+          passwordInput.dispatchEvent(new Event("input", { bubbles: true }));
           alert("הסיסמה הוזרקה בהצלחה!");
         } else {
           alert("לא נמצא שדה סיסמה בדף הזה.");
@@ -49,6 +52,6 @@ export const injectPasswordToPage = async (passwordToInject) => {
       args: [passwordToInject],
     });
   } catch (error) {
-    console.error("שגיאה בהזרקת הסיסמה:", error);
+    alert("שגיאה בהזרקת הסיסמה");
   }
 };

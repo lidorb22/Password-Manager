@@ -1,19 +1,13 @@
 import { useState, useEffect } from "react";
-import { generatePassword, isStrongPassword, injectPasswordToPage } from "./passwordHelpers";
+import {
+  generatePassword,
+  isStrongPassword,
+  injectPasswordToPage,
+} from "./passwordHelpers";
 
 function App() {
   // --- States (ניהול זיכרון האפליקציה) ---
   const [currentPassword, setCurrentPassword] = useState(""); // שומר את הסיסמה שנוצרה
-  const [serverStatus, setServerStatus] = useState("מתחבר לשרת..."); // שומר את מצב החיבור ל-Backend
-
-  // --- Side Effects (פעולות שקורות כשהתוסף נפתח) ---
-  useEffect(() => {
-    // בדיקה אם השרת חי ומגיב
-    fetch("http://localhost:3000/api/data")
-      .then((res) => res.json())
-      .then((data) => setServerStatus("מחובר לשרת: " + (data.message || "פעיל")))
-      .catch(() => setServerStatus("שגיאה בחיבור לשרת (וודא שה-Node רץ)"));
-  }, []);
 
   // --- Handlers (הפונקציות שמגיבות ללחיצות כפתור) ---
 
@@ -39,33 +33,74 @@ function App() {
 
   // --- UI (מה שהמשתמש רואה) ---
   return (
-    <div style={{ padding: "15px", textAlign: "center", width: "300px", fontFamily: "Arial", direction: "rtl" }}>
+    <div
+      style={{
+        padding: "15px",
+        textAlign: "center",
+        width: "300px",
+        fontFamily: "Arial",
+        direction: "rtl",
+      }}
+    >
       <h2 style={{ color: "#333", marginBottom: "5px" }}>Password Manager</h2>
-      
-      {/* תצוגת סטטוס שרת */}
-      <div style={{ fontSize: "11px", marginBottom: "15px", color: serverStatus.includes("שגיאה") ? "#ff4d4d" : "#4caf50" }}>
-        {serverStatus}
-      </div>
 
       {/* תיבת הצגת הסיסמה */}
-      <div style={{ backgroundColor: "#f4f4f4", padding: "15px", borderRadius: "8px", border: "1px solid #ddd", marginBottom: "15px" }}>
-        <p style={{ margin: "0 0 5px 0", fontSize: "12px", color: "#666" }}>סיסמה שנוצרה:</p>
-        <strong style={{ fontSize: "20px", letterSpacing: "2px", color: "#222", wordBreak: "break-all" }}>
+      <div
+        style={{
+          backgroundColor: "#f4f4f4",
+          padding: "15px",
+          borderRadius: "8px",
+          border: "1px solid #ddd",
+          marginBottom: "15px",
+        }}
+      >
+        <p style={{ margin: "0 0 5px 0", fontSize: "12px", color: "#666" }}>
+          סיסמה שנוצרה:
+        </p>
+        <strong
+          style={{
+            fontSize: "20px",
+            letterSpacing: "2px",
+            color: "#222",
+            wordBreak: "break-all",
+          }}
+        >
           {currentPassword || "--------"}
         </strong>
       </div>
 
       {/* כפתורי פעולה */}
-      <button 
-        onClick={handleGenerateClick} 
-        style={{ backgroundColor: "#4CAF50", color: "white", width: "100%", padding: "12px", border: "none", borderRadius: "5px", cursor: "pointer", marginBottom: "10px", fontWeight: "bold", fontSize: "14px" }}
+      <button
+        onClick={handleGenerateClick}
+        style={{
+          backgroundColor: "#4CAF50",
+          color: "white",
+          width: "100%",
+          padding: "12px",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+          marginBottom: "10px",
+          fontWeight: "bold",
+          fontSize: "14px",
+        }}
       >
         ייצר סיסמה חזקה
       </button>
 
-      <button 
-        onClick={handleInjectClick} 
-        style={{ backgroundColor: "#2196F3", color: "white", width: "100%", padding: "12px", border: "none", borderRadius: "5px", cursor: "pointer", fontWeight: "bold", fontSize: "14px" }}
+      <button
+        onClick={handleInjectClick}
+        style={{
+          backgroundColor: "#2196F3",
+          color: "white",
+          width: "100%",
+          padding: "12px",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+          fontWeight: "bold",
+          fontSize: "14px",
+        }}
       >
         הזרק סיסמה לדף
       </button>
