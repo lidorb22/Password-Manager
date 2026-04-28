@@ -1,0 +1,57 @@
+/* Base styles shared by all button variants */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-6);
+  font-family: var(--font-family);
+  font-size: var(--font-base);
+  font-weight: var(--weight-semibold);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border: none;
+  outline: none;
+}
+
+/* Disabled state - reduced opacity and no pointer */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primary variant - main brand gradient (purple to pink) */
+.btn-primary {
+  background: var(--gradient-brand);
+  color: var(--white);
+  box-shadow: var(--shadow-md);
+}
+
+/* Lift effect on hover */
+.btn-primary:hover:not(:disabled) {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+/* Press effect on click */
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Secondary variant - subtle gray for less important actions */
+.btn-secondary {
+  background: var(--gray-100);
+  color: var(--gray-800);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--gray-200);
+}
+
+/* Modifier - stretches button to full container width */
+.btn-full {
+  width: 100%;
+}

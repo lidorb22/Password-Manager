@@ -1,0 +1,13 @@
+/* Main app container - centered card with white background */
+.card {
+  width: 540px;
+  max-width: 95%;
+  min-height: 720px;
+  margin: var(--space-8) auto;
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}

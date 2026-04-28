@@ -1,0 +1,84 @@
+/* Main wrapper - takes full height of the card */
+.welcome-screen {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Content area between header and footer */
+.welcome-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--space-6) var(--space-6);
+  gap: var(--space-10);
+}
+
+/* Title section */
+.welcome-titles {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Main title - "Welcome!" */
+.welcome-title {
+  font-family: var(--font-display);
+  font-size: var(--font-3xl);
+  font-weight: var(--weight-bold);
+  color: var(--gray-800);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* Subtitle below the main title */
+.welcome-subtitle {
+  font-family: var(--font-family);
+  font-size: var(--font-base);
+  color: var(--gray-600);
+  margin: 0;
+}
+
+/* Action buttons container */
+.welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Footer with security badges */
+.welcome-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-6);
+  border-top: 1px solid var(--gray-100);
+}
+
+/* Single badge row (dot + text) */
+.welcome-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-sm);
+  color: var(--gray-600);
+}
+
+/* Small colored dot before each badge text */
+.welcome-badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+}
+
+.welcome-badge-success {
+  background: var(--success-400);
+}
+
+.welcome-badge-purple {
+  background: var(--purple-400);
+}

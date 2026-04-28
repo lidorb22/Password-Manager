@@ -1,29 +1,26 @@
 import { useState } from "react";
-import Notification from "./components/Notification";
+import Notification from "./components/Notification/Notification";
+import Card from "./components/Card/Card";
+import Welcome from "./screens/Welcome/Welcome";
+import Login from "./screens/Login/Login";
+import Register from "./screens/Register/Register";
 import { useNotification } from "./hooks/useNotification";
 
 function App() {
-  const [serverData, setServerData] = useState("טוען נתונים...");
-  /* ניהול הודעות קופצות */
+  /* Current screen state - controls which screen is shown */
+  const [currentScreen, setCurrentScreen] = useState("welcome");
+
+  /* Logged-in user data - set after successful login */
+  const [currentUser, setCurrentUser] = useState(null);
+
+  /* Pop-up notification management */
   const { notification, hideNotification, showNotification } = useNotification();
 
-  const fetchData = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/data");
-      const data = await response.json();
-      setServerData(data.message);
-    } catch (error) {
-      setServerData("שגיאה בחיבור לשרת");
-      console.error(error);
-      /* הצגת הודעת שגיאת שרת למשתמש */
-      showNotification("SERVER_ERROR");
-    }
-  };
-
   /* 
-    פונקציית הפניה ומילוי אוטומטי  
-    שולחת הודעה ל-Background Script שיפתח את האתר וימלא את הפרטים
-    צריכה להיקרא ע"י פונקציית רשימת הסיסמאות   */
+    Redirect and autofill function
+    Sends a message to the Background Script to open the website and fill in the credentials
+    Should be called from the passwords list component
+  */
   // eslint-disable-next-line no-unused-vars
   const redirectAndAutofill = async (link, username, password) => {
     try {
@@ -40,8 +37,8 @@ function App() {
   };
 
   return (
-    <div style={{ padding: "20px", textAlign: "center" }}>
-      {/* ההודעה הקופצת - מופיעה בראש המסך כשיש הודעה פעילה */}
+    <Card>
+      {/* Pop-up notification - shown at top of screen when active */}
       <Notification
         message={notification.message}
         icon={notification.icon}
@@ -49,14 +46,35 @@ function App() {
         onClose={hideNotification}
       />
 
-      <h1>Password Manager</h1>
-      <div className="card">
-        <p>
-          תגובה מהשרת: <strong>{serverData}</strong>
-        </p>
-        <button onClick={fetchData}>משוך נתונים עכשיו</button>
-      </div>
-    </div>
+     {/* Show Welcome screen */}
+      {currentScreen === "welcome" && (
+        <Welcome
+          onCreateAccount={() => setCurrentScreen("register")}
+          onSignIn={() => setCurrentScreen("login")}
+        />
+      )}
+
+      {/* Show Login screen */}
+      {currentScreen === "login" && (
+        <Login
+          onBack={() => setCurrentScreen("welcome")}
+          onLoginSuccess={(userData) => {
+            setCurrentUser(userData);
+            setCurrentScreen("passwords");
+          }}
+          showNotification={showNotification}
+        />
+      )}
+
+      {/* Show Register screen */}
+      {currentScreen === "register" && (
+        <Register
+        onBack={() => setCurrentScreen("welcome")}
+        onRegisterSuccess={() => setCurrentScreen("login")}
+        showNotification={showNotification}
+        />
+      )}
+    </Card>
   );
 }
 

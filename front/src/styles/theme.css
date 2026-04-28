@@ -1,0 +1,113 @@
+/* 
+  Design System - Password Manager
+  All colors, fonts and spacings used across the app
+*/
+
+:root {
+  /* ============== COLORS ============== */
+  
+  /* Brand colors - main gradient */
+  --purple-100: #f3e8ff;
+  --purple-200: #e9d5ff;
+  --purple-300: #d8b4fe;
+  --purple-400: #c084fc;
+  --purple-600: #9333ea;
+  --purple-800: #6b21a8;
+  --purple-50: #faf5ff;
+
+  --pink-50: #fdf2f8;
+  --pink-200: #fbcfe8;
+  --pink-400: #f472b6;
+
+  --blue-100: #dbeafe;
+
+  /* Semantic colors */
+  --success-50: #f0fdf4;
+  --success-400: #4ade80;
+  --success-500: #34d399;
+  --success-600: #16a34a;
+
+  --error-50: #fef2f2;
+  --error-400: #f87171;
+  --error-500: #ef4444;
+
+  --warning-50: #fff7ed;
+  --warning-200: #fed7aa;
+  --warning-400: #fb923d;
+  --warning-500: #f97316;
+  --warning-700: #c2410c;
+
+  /* Strength indicator */
+  --strength-weak: #f87171;     /* red-400 */
+  --strength-fair: #fb923d;     /* orange-400 */
+  --strength-good: #facc15;     /* yellow-400 */
+  --strength-strong: #4ade80;   /* green-400 */
+
+  /* Neutrals */
+  --white: #ffffff;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+
+  /* Translucent */
+  --white-20: rgba(255, 255, 255, 0.2);
+  --white-80: rgba(255, 255, 255, 0.8);
+
+  /* Gradient */
+  --gradient-brand: linear-gradient(135deg, var(--purple-400), var(--pink-400));
+  --gradient-background: linear-gradient(135deg, var(--purple-100), var(--pink-50), var(--blue-100));
+  --gradient-card: linear-gradient(135deg, var(--purple-50), var(--pink-50));
+  --gradient-success: linear-gradient(135deg, var(--success-400), var(--success-500));
+
+  /* Typography */
+  --font-family: "Inter", "Segoe UI", "Tahoma", sans-serif;
+  --font-display: "Playfair Display", "Georgia", serif;
+  
+  /* Font sizes */
+  --font-xs: 12px;
+  --font-sm: 14px;
+  --font-base: 16px;
+  --font-lg: 18px;
+  --font-xl: 20px;
+  --font-2xl: 24px;
+  --font-3xl: 28px;
+
+  /* Font weights */
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Spacing*/
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* Borders & Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+
+  /* Animatons */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+  --transition-slow: 0.4s ease;
+}

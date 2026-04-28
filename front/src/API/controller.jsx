@@ -18,15 +18,14 @@ const registerUser = async (userData) => {
   }
 };
 
-const loginUser = async (email) => {
+const loginUser = async (userData) => {
   try {
-    const url = new URL("http://localhost:3000/api/user/login");
-    url.searchParams.append("email", email);
-    const response = await fetch(url, {
-      method: "GET",
+    const response = await fetch("http://localhost:3000/api/user/login", {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify(userData),
     });
     if (!response.ok) {
       throw new Error("Failed to login user");

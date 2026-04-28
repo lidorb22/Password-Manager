@@ -23,21 +23,21 @@
 
 /*צבעים לפי סוג ההודעה */
 .pm-notification-success {
-  background-color: #d4f5e0;
-  color: #2d6a4f;
-  border: 1px solid #a7e0bc;
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #4ade80;
 }
 
 .pm-notification-error {
-  background-color: #fde2e4;
-  color: #9d3242;
-  border: 1px solid #f5b5bc;
+  background-color: #fef2f2;
+  color: #ef4444;
+  border: 1px solid #f87171;
 }
 
 .pm-notification-warning {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffe08a;
+  background-color: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
 }
 
 /*אייקון בצד*/

@@ -1,53 +1,55 @@
+@import "../../styles/theme.css";
+
 /* הודעה קופצת*/
 .notification {
   position: fixed;
-  top: 20px;
+  top: var(--space-5);
   left: 50%;
   transform: translateX(-50%);
   min-width: 280px;
   max-width: 90%;
-  padding: 14px 18px;
-  border-radius: 12px;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-family: "Segoe UI", Tahoma, sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  gap: var(--space-3);
+  font-family: var(--font-family);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-medium);
+  box-shadow: var(--shadow-lg);
   z-index: 9999;
-  animation: slideDown 0.3s ease-out;
+  animation: slideDown var(--transition-base) ease-out;
   backdrop-filter: blur(10px);
 }
 
 /* צבעים לפי סוג ההודעה */
 .notification-success {
-  background-color: #d4f5e0;
-  color: #2d6a4f;
-  border: 1px solid #a7e0bc;
+  background-color: var(--success-50);
+  color: var(--success-600);
+  border: 1px solid var(--success-400);
 }
 
 .notification-error {
-  background-color: #fde2e4;
-  color: #9d3242;
-  border: 1px solid #f5b5bc;
+  background-color: var(--error-50);
+  color: var(--error-500);
+  border: 1px solid var(--error-400);
 }
 
 .notification-warning {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffe08a;
+  background-color: var(--warning-50);
+  color: var(--warning-700);
+  border: 1px solid var(--warning-200);
 }
 
 .notification-info {
-  background-color: #d6e9f8;
-  color: #1e5a8a;
-  border: 1px solid #a8cce8;
+  background-color: var(--purple-50);
+  color: var(--purple-800);
+  border: 1px solid var(--purple-200);
 }
 
 /* אייקון בצד */
 .notification-icon {
-  font-size: 20px;
+  font-size: var(--font-xl);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -66,11 +68,11 @@
   border: none;
   color: inherit;
   cursor: pointer;
-  font-size: 14px;
-  padding: 4px 8px;
-  border-radius: 6px;
+  font-size: var(--font-sm);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
   opacity: 0.6;
-  transition: opacity 0.2s, background-color 0.2s;
+  transition: opacity var(--transition-fast), background-color var(--transition-fast);
   flex-shrink: 0;
 }
 
