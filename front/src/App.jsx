@@ -5,6 +5,11 @@ import Welcome from "./screens/Welcome/Welcome";
 import Login from "./screens/Login/Login";
 import Register from "./screens/Register/Register";
 import { useNotification } from "./hooks/useNotification";
+import {
+  generatePassword,
+  isStrongPassword,
+  injectPasswordToPage,
+} from "./passwordHelpers";
 
 function App() {
   /* Current screen state - controls which screen is shown */
@@ -12,6 +17,9 @@ function App() {
 
   /* Logged-in user data - set after successful login */
   const [currentUser, setCurrentUser] = useState(null);
+
+  /* Currently generated password - will be used in passwords list screen */
+  const [currentPassword, setCurrentPassword] = useState("");
 
   /* Pop-up notification management */
   const { notification, hideNotification, showNotification } = useNotification();
@@ -36,6 +44,33 @@ function App() {
     }
   };
 
+  /* 
+    Generate a strong password
+    Will be wired to a button in the passwords list / add password screen
+  */
+  // eslint-disable-next-line no-unused-vars
+  const handleGenerateClick = () => {
+    const newPass = generatePassword();
+    if (isStrongPassword(newPass)) {
+      setCurrentPassword(newPass);
+    } else {
+      showNotification("PASSWORD_GENERATION_ERROR");
+    }
+  };
+
+  /* 
+    Inject the current password into the active page's password field
+    Will be wired to a button in the passwords list / add password screen
+  */
+  // eslint-disable-next-line no-unused-vars
+  const handleInjectClick = () => {
+    if (!currentPassword) {
+      showNotification("NO_PASSWORD_GENERATED");
+      return;
+    }
+    injectPasswordToPage(currentPassword);
+  };
+
   return (
     <Card>
       {/* Pop-up notification - shown at top of screen when active */}
@@ -46,7 +81,7 @@ function App() {
         onClose={hideNotification}
       />
 
-     {/* Show Welcome screen */}
+      {/* Show Welcome screen */}
       {currentScreen === "welcome" && (
         <Welcome
           onCreateAccount={() => setCurrentScreen("register")}
@@ -69,9 +104,9 @@ function App() {
       {/* Show Register screen */}
       {currentScreen === "register" && (
         <Register
-        onBack={() => setCurrentScreen("welcome")}
-        onRegisterSuccess={() => setCurrentScreen("login")}
-        showNotification={showNotification}
+          onBack={() => setCurrentScreen("welcome")}
+          onRegisterSuccess={() => setCurrentScreen("login")}
+          showNotification={showNotification}
         />
       )}
     </Card>
