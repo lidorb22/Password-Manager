@@ -12,7 +12,7 @@ const {
  * @swagger
  * /api/account/create:
  *  post:
- *    summary: יצירת חשבון חדש למשתמש קיים
+ *    summary: Create a new account for an existing user
  *    requestBody:
  *      content:
  *        application/json:
@@ -31,7 +31,7 @@ const {
  *                type: string
  *    responses:
  *      200:
- *        description: הצלחה
+ *        description: Account created successfully
  */
 router.post("/create", async (req, res) => {
   const { id, site, link, username, password } = req.body;
@@ -58,7 +58,7 @@ router.post("/create", async (req, res) => {
  * @swagger
  * /api/account/decrypt:
  *  get:
- *    summary: פענוח של כל הסיסמאות לאותו ID
+ *    summary: Decrypt a password for a specific account
  *    parameters:
  *    - name: id
  *      in: query
@@ -72,7 +72,7 @@ router.post("/create", async (req, res) => {
  *        type: string
  *    responses:
  *      200:
- *        description: הצלחה
+ *        description: Password decrypted successfully
  */
 router.get("/decrypt", async (req, res) => {
   const { id, encryptedPassword } = req.query;
@@ -96,7 +96,7 @@ router.get("/decrypt", async (req, res) => {
  * @swagger
  * /api/account/encrypt:
  *  get:
- *    summary: הצפנה של כל הסיסמאות לאותו ID
+ *    summary:  Encrypt all passwords for a specific user
  *    parameters:
  *    - name: id
  *      in: query
@@ -105,7 +105,7 @@ router.get("/decrypt", async (req, res) => {
  *        type: string
  *    responses:
  *      200:
- *        description: הצלחה
+ *        description: All passwords encrypted successfully
  */
 router.get("/encrypt", async (req, res) => {
   const { id } = req.query;

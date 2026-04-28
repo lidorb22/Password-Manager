@@ -1,11 +1,26 @@
 const mongoose = require("mongoose");
 const userSchema = require("../schema");
+const bcrypt = require("bcrypt");
 
-const createNewUser = async (firstname, lastname, email) => {
+/* Hashes the master password before saving it to the database.*/
+const hashPassword = async (password) => {
+  const saltRounds = 10;                      /*Number of rounds for the encryption*/
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+  return hashedPassword;
+};
+
+/*Compares a plain password with the hashed password during login*/
+const comparePassword = async (password, hashedPassword) => {
+  const isMatch = await bcrypt.compare(password, hashedPassword);
+  return isMatch;
+};
+
+const createNewUser = async (firstname, lastname, email, password) => {
   const newUser = new userSchema({
     firstname,
     lastname,
     email,
+    password,
   });
   try {
     const savedUser = await newUser.save();
@@ -33,4 +48,4 @@ const getUserById = async (id) => {
   }
 };
 
-module.exports = { createNewUser, getUserByEmail, getUserById };
+module.exports = { createNewUser, getUserByEmail, getUserById, hashPassword, comparePassword };

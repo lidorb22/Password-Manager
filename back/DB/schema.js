@@ -21,6 +21,11 @@ const userSchema = new mongoose.Schema(
       trim: true,
       lowercase: true, // שומר הכל באותיות קטנות
     },
+    password: {
+      type: String,
+      required: [true, "Please provide a master password"],
+      minlength: 8,
+    },
     accounts: {
       type: [
         {
