@@ -7,6 +7,7 @@ const registerUser = async (userData) => {
       },
       body: JSON.stringify(userData),
     });
+    
     if (!response.ok) {
       throw new Error("Failed to register user");
     }

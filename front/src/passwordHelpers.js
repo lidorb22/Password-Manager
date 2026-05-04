@@ -23,13 +23,44 @@ export const generatePassword = () => {
     .join("");
 };
 
+/*
+  Check each password requirement individually.
+*/
+export const getPasswordRequirements = (password) => {
+  return {
+    isCorrectLength: password.length === 8,
+    hasLowerCase: /[a-z]/.test(password),
+    hasUpperCase: /[A-Z]/.test(password),
+    hasNumber: /[0-9]/.test(password),
+    hasSymbol: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+  };
+};
+
+/*
+  Strict validation - returns true only if ALL requirements are met.
+*/
 export const isStrongPassword = (password) => {
-  if (password.length !== 8) return false;
-  const hasLowerCase = /[a-z]/.test(password);
-  const hasUpperCase = /[A-Z]/.test(password);
-  const hasNumber = /[0-9]/.test(password);
-  const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-  return hasLowerCase && hasUpperCase && hasNumber && hasSymbol;
+  const reqs = getPasswordRequirements(password);
+  return (
+    reqs.isCorrectLength &&
+    reqs.hasLowerCase &&
+    reqs.hasUpperCase &&
+    reqs.hasNumber &&
+    reqs.hasSymbol
+  );
+};
+
+/*
+  Calculate password strength score (0-4) for the visual strength meter.
+*/
+export const getPasswordStrength = (password) => {
+  const reqs = getPasswordRequirements(password);
+  let score = 0;
+  if (reqs.hasLowerCase) score++;
+  if (reqs.hasUpperCase) score++;
+  if (reqs.hasNumber) score++;
+  if (reqs.hasSymbol) score++;
+  return score;
 };
 
 export const injectPasswordToPage = async (passwordToInject) => {
@@ -44,14 +75,14 @@ export const injectPasswordToPage = async (passwordToInject) => {
         if (passwordInput) {
           passwordInput.value = pass;
           passwordInput.dispatchEvent(new Event("input", { bubbles: true }));
-          alert("הסיסמה הוזרקה בהצלחה!");
+          alert("Password injected successfully!");
         } else {
-          alert("לא נמצא שדה סיסמה בדף הזה.");
+          alert("No password field was found on this page.");
         }
       },
       args: [passwordToInject],
     });
-  } catch (error) {
-    alert("שגיאה בהזרקת הסיסמה");
+  } catch {
+    alert("Failed to inject the password");
   }
 };

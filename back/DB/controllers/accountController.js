@@ -36,7 +36,7 @@ function decrypt(key, encryptedData) {
 }
 
 const decryptPassword = (id, password) => {
-  decryptedPassword = decrypt(id.toString(), password);
+  const decryptedPassword = decrypt(id.toString(), password);
   return decryptedPassword;
 };
 

@@ -1,9 +1,10 @@
 import { useState } from "react";
 import Notification from "./components/Notification/Notification";
 import Card from "./components/Card/Card";
-import Welcome from "./screens/Welcome/Welcome";
-import Login from "./screens/Login/Login";
-import Register from "./screens/Register/Register";
+import Welcome from "./Screens/Welcome/Welcome";
+import Login from "./Screens/Login/Login";
+import Register from "./Screens/Register/Register";
+import PasswordList from "./Screens/PasswordList/PasswordList";
 import { useNotification } from "./hooks/useNotification";
 import {
   generatePassword,
@@ -105,10 +106,24 @@ function App() {
       {currentScreen === "register" && (
         <Register
           onBack={() => setCurrentScreen("welcome")}
-          onRegisterSuccess={() => setCurrentScreen("login")}
+          onRegisterSuccess={(userData) => {
+            setCurrentUser(userData);
+            setCurrentScreen("passwords");
+          }}
           showNotification={showNotification}
         />
       )}
+
+      {/* Show Passwords List screen */}
+      {currentScreen === "passwords" && currentUser && (
+        <PasswordList
+           user={currentUser}
+           setUser={setCurrentUser}
+           showNotification={showNotification}
+        />
+      )}
+
+
     </Card>
   );
 }

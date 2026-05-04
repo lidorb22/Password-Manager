@@ -1,29 +1,47 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Register.css";
 import AuthHeader from "../../components/AuthHeader/AuthHeader";
 import ProgressDots from "../../components/ProgressDots/ProgressDots";
 import TextField from "../../components/TextField/TextField";
 import Button from "../../components/Button/Button";
 import { registerUser } from "../../API/controller";
+import confetti from "canvas-confetti";
+import MasterPassword from "./MasterPassword/MasterPassword";
 
 /* Multi-step registration flow: Email -> Name -> Password -> Success */
 function Register({ onBack, onRegisterSuccess, showNotification }) {
+
+  /* ============================================================
+     SECTION 1: STATE
+     ============================================================ */
+
   /* Current step (1-4) */
   const [step, setStep] = useState(1);
 
   /* Form data accumulated across steps */
   const [email, setEmail] = useState("");
   const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+
+  /* User data returned from the server after successful registration. */
+  const [registeredUser, setRegisteredUser] = useState(null);
+
   const [isLoading, setIsLoading] = useState(false);
+
+  /* ============================================================
+     SECTION 2: VALIDATION
+     ============================================================ */
 
   /* Email validation regex */
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-  /* Handle moving forward through steps */
-  const handleNext = async () => {
+  /* ============================================================
+     SECTION 3: NAVIGATION HANDLERS
+     ============================================================ */
+
+  /* Handle moving forward through steps 1 and 2.
+     Step 3 has its own submission flow (handleCreateVault).
+     Step 4 transitions automatically (no button press). */
+  const handleNext = () => {
     /* Step 1: validate email */
     if (step === 1) {
       if (!emailRegex.test(email)) {
@@ -36,38 +54,12 @@ function Register({ onBack, onRegisterSuccess, showNotification }) {
 
     /* Step 2: validate name */
     if (step === 2) {
-      if (!firstname.trim() || !lastname.trim()) {
+      if (!firstname.trim()) {
         showNotification("WRONG_CREDENTIALS");
         return;
       }
       setStep(3);
       return;
-    }
-
-    /* Step 3: validate password and create account */
-    if (step === 3) {
-      if (password.length < 8) {
-        showNotification("WRONG_CREDENTIALS");
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        await registerUser({ firstname, lastname, email, password });
-        showNotification("REGISTRATION_SUCCESS");
-        setStep(4);
-      } catch (error) {
-        console.error("Registration error:", error);
-        showNotification("SERVER_ERROR");
-      } finally {
-        setIsLoading(false);
-      }
-      return;
-    }
-
-    /* Step 4: finish registration */
-    if (step === 4) {
-      onRegisterSuccess();
     }
   };
 
@@ -80,9 +72,75 @@ function Register({ onBack, onRegisterSuccess, showNotification }) {
     }
   };
 
+
+  /* ============================================================
+     SECTION 4: STEP 3 - CREATE VAULT SUBMISSION
+     ============================================================ */
+
+  const handleCreateVault = async (password) => {
+    setIsLoading(true);
+    try {
+      /* Send the registration to the server.
+         Save the returned user data for use in step 4. */
+      
+      const userData = await registerUser({ firstname,email,password });
+      setRegisteredUser(userData);
+      setStep(4);
+    } catch (error) {
+      console.error("Registration error:", error);
+      showNotification("REGISTRATION_FAILED");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+    /* ============================================================
+     SECTION 4.5: SUCCESS SCREEN EFFECT
+     ============================================================ */
+
+      useEffect(() => {
+       if (step !== 4) return;
+
+      /* Fire confetti from both sides for a celebration effect. */
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
+      setTimeout(() => {
+        confetti({
+          particleCount: 80,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.7 },
+        });
+        confetti({
+          particleCount: 80,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.7 },
+        });
+      }, 250);
+
+      /* Auto-transition to the vault after 10 seconds. */
+      const timer = setTimeout(() => {
+        onRegisterSuccess(registeredUser);
+      }, 10000);
+
+      /* Cleanup - if the component unmounts before the timer fires, cancel the pending transition. */
+      return () => clearTimeout(timer);
+    }, [step]);
+
+
+  /* ============================================================
+     SECTION 5: RENDER (JSX)
+     What the user actually sees on the screen.
+     ============================================================ */
+
   return (
     <div className="register-screen">
-      {/* Header with shield icon and back arrow */}
+
+      {/* ---------- HEADER ---------- */}
       <AuthHeader
         title="Create Account"
         subtitle="Join your secure vault"
@@ -90,17 +148,18 @@ function Register({ onBack, onRegisterSuccess, showNotification }) {
         onBack={handleBack}
       />
 
-      {/* Main content */}
+      {/* ---------- CONTENT AREA ---------- */}
       <div className="register-content">
-        {/* Progress indicator */}
+
+        {/* Progress dots indicator  */}
         <ProgressDots total={4} current={step} />
 
-        {/* Step 1: Email */}
+        {/* ===== STEP 1: EMAIL ===== */}
         {step === 1 && (
           <>
             <div className="register-titles">
               <h2 className="register-title">Create Your Account</h2>
-              <p className="register-subtitle">Let's start with your email</p>
+              <p className="register-subtitle">Enter your email to get started</p>
             </div>
 
             <TextField
@@ -113,75 +172,69 @@ function Register({ onBack, onRegisterSuccess, showNotification }) {
           </>
         )}
 
-        {/* Step 2: Name */}
+        {/* ===== STEP 2: NAME ===== */}
         {step === 2 && (
           <>
             <div className="register-titles">
               <h2 className="register-title">What's Your Name?</h2>
-              <p className="register-subtitle">Tell us how to address you</p>
+              <p className="register-subtitle">We'll use this to greet you</p>
             </div>
 
             <div className="register-form">
               <TextField
-                label="First Name"
-                placeholder="Enter your first name"
+                label="Your Name"
+                placeholder="Enter your name"
                 value={firstname}
                 onChange={(e) => setFirstname(e.target.value)}
               />
-              <TextField
-                label="Last Name"
-                placeholder="Enter your last name"
-                value={lastname}
-                onChange={(e) => setLastname(e.target.value)}
-              />
+            </div>
+
+            {/* Bottom navigation - Back and Continue side by side */}
+            <div className="register-actions">
+              <Button variant="secondary" onClick={handleBack}>
+                Back
+              </Button>
+              <Button variant="primary" onClick={handleNext}>
+                Continue
+              </Button>
             </div>
           </>
         )}
 
-        {/* Step 3: Master Password */}
+        {/* ===== STEP 3: MASTER PASSWORD ===== */}
         {step === 3 && (
-          <>
-            <div className="register-titles">
-              <h2 className="register-title">Create Master Password</h2>
-              <p className="register-subtitle">
-                This will protect all your other passwords
-              </p>
-            </div>
-
-            <TextField
-              label="Master Password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter master password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              rightIcon={showPassword ? "🙈" : "👁"}
-              onRightIconClick={() => setShowPassword(!showPassword)}
-            />
-          </>
+          <MasterPassword
+            onSubmit={handleCreateVault}
+            onBack={handleBack}
+            isLoading={isLoading}
+          />
         )}
 
-        {/* Step 4: Success */}
+        {/* ===== STEP 4: SUCCESS ===== */}
         {step === 4 && (
           <div className="register-success">
             <div className="register-success-icon">✓</div>
             <h2 className="register-title">Account Created!</h2>
-            <p className="register-subtitle">Welcome to Password Manager</p>
+            <p className="register-subtitle">Your secure vault is ready to use</p>
+
+            {/* Loading bar - fills from 0% to 100% over 10 seconds */}
+             <div className="register-success-progress">
+              <div className="register-success-progress-bar" />
+             </div>
           </div>
         )}
 
-        {/* Continue / Action button */}
-        <Button
-          variant="primary"
-          fullWidth
-          onClick={handleNext}
-          disabled={isLoading}
-        >
-          {step === 4
-            ? "Get Started"
-            : isLoading
-            ? "Creating account..."
-            : "Continue"}
-        </Button>
+        {/* ---------- CONTINUE BUTTON  ---------- */}
+        {step === 1 && (
+          <Button
+            variant="primary"
+            fullWidth
+            onClick={handleNext}
+          >
+            Continue
+          </Button>
+        )}
+
       </div>
     </div>
   );

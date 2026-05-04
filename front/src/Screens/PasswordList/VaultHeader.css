@@ -1,0 +1,81 @@
+/* Header bar at the top of the vault screen.*/
+.vault-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-10) var(--space-6);
+  background: var(--gradient-brand);
+  color: var(--white);
+}
+
+/* Left section - holds the lock icon and the greeting text together.*/
+.vault-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* Lock icon container .*/
+.vault-header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+}
+
+.vault-header-icon svg {
+  width: 30px;
+  height: 30px;
+}
+
+/*  Text wrapper - title above subtitle.*/
+.vault-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/*  Main greeting - "Hello, {name}!"*/
+.vault-header-title {
+  margin: 0;
+  font-size: var(--font-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--white);
+  letter-spacing: -0.01em;
+}
+
+/*  Subtitle - "Password Manager"*/
+.vault-header-subtitle {
+  margin: 0;
+  font-size: var(--font-base);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Add button - the + on the right side.*/
+.vault-header-add {
+  background: none;
+  border: none;
+  padding: var(--space-1);
+  cursor: pointer;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+/* Slight grow + brighter background on hover */
+.vault-header-add:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.08);
+}
+
+/* Pressed effect - slight shrink */
+.vault-header-add:active {
+  transform: scale(0.95);
+}
+
+.vault-header-add svg {
+  width: 24px;
+  height: 24px;
+}

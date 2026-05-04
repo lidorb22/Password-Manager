@@ -1,7 +1,15 @@
 import { showInPageNotification } from "./inPageNotification.js";
-/*Content Script*/
 
-/*חיפוש שדה משתמש בדף*/
+/*
+  Content Script
+  Runs on every web page (per manifest.json - matches "<all_urls>").
+  Listens for autofill requests from the background script
+  and tries to fill in username/password fields on the page.
+*/
+
+/*
+  Find the username/email field on the page.
+*/
 function findUsernameField() {
   const selectors = [
     'input[autocomplete="username"]',
@@ -12,7 +20,6 @@ function findUsernameField() {
     'input[name="email"]',
     'input[id*="username" i]',
     'input[id*="email" i]',
-    'input[type="text"]',
   ];
 
   for (const selector of selectors) {
@@ -24,7 +31,9 @@ function findUsernameField() {
   return null;
 }
 
-/*חיפוש שדה סיסמא בדף */
+/*
+  Find the password field on the page.
+*/
 function findPasswordField() {
   const selectors = [
     'input[autocomplete="current-password"]',
@@ -42,7 +51,9 @@ function findPasswordField() {
   return null;
 }
 
-/*בדיקה האם יש שדות נסתרים שצריך למלא */
+/*
+  Check if an input is actually visible on the page.
+*/
 function isFieldVisible(element) {
   if (!element) return false;
   const style = window.getComputedStyle(element);
@@ -54,7 +65,31 @@ function isFieldVisible(element) {
   );
 }
 
-/*מילוי ערך בשדה */
+/*
+  Try to find login fields, retrying for up to 2.5 seconds.
+*/
+async function findFieldsWithRetry(maxAttempts = 5, delayMs = 500) {
+  for (let i = 0; i < maxAttempts; i++) {
+    const usernameField = findUsernameField();
+    const passwordField = findPasswordField();
+
+    /* If found the password field, done. */
+    if (passwordField) {
+      return { usernameField, passwordField };
+    }
+
+    /* Wait before trying again */
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+  }
+
+  /* Final attempt - return whatever was found */
+  return {
+    usernameField: findUsernameField(),
+    passwordField: findPasswordField(),
+  };
+}
+
+
 function fillField(field, value) {
   const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
     window.HTMLInputElement.prototype,
@@ -62,53 +97,69 @@ function fillField(field, value) {
   ).set;
   nativeInputValueSetter.call(field, value);
 
-  /*גורמים לאתר לחשוב שהמשתמש ממלא את השדה ידנית*/
+  /* Trigger events the same way a user typing would */
   field.dispatchEvent(new Event("input", { bubbles: true }));
   field.dispatchEvent(new Event("change", { bubbles: true }));
   field.focus();
 }
 
-/*מילוי שני השדות : משתמש וסיסמא*/
-function autofillCredentials(username, password) {
-  const usernameField = findUsernameField();
-  const passwordField = findPasswordField();
 
-  /*אם לא נמצאו שדות התחברות - מציג הודעת שגיאה בדף עצמו*/
-  if (!usernameField && !passwordField) {
+async function autofillCredentials(username, password) {
+  /* Try to find both fields, with retry for slow-loading forms */
+  const { usernameField, passwordField } = await findFieldsWithRetry();
+
+  /* No password field found. Cannot proceed. */
+  if (!passwordField) {
     showInPageNotification(
-      "One or more details are incorrect. Please try again.",
+      "Could not find a password field on this page",
       "✕",
       "error"
     );
     return {
       success: false,
-      error: "No login fields were found on this page",
+      error: "No password field found on this page",
     };
   }
 
-  if (usernameField) {
-    fillField(usernameField, username);
-  }
+  /* Always fill the password*/
+  fillField(passwordField, password);
 
-  if (passwordField) {
-    fillField(passwordField, password);
+  /* If username field is missing - warn but don't fail. */
+  if (!usernameField) {
+    showInPageNotification(
+      "Password filled, but no username field was found. You may need to enter your username manually.",
+      "⚠",
+      "warning"
+    );
+    return {
+      success: true,
+      filledUsername: false,
+      filledPassword: true,
+    };
   }
-
-  /*הצגת הודעת הצלחה בדף עצמו*/
-  showInPageNotification("Login was successful", "✓", "success");
+  
+  fillField(usernameField, username);
+  showInPageNotification(
+    "Login details filled in successfully",
+    "✓",
+    "success"
+  );
 
   return {
     success: true,
-    filledUsername: !!usernameField,
-    filledPassword: !!passwordField,
+    filledUsername: true,
+    filledPassword: true,
   };
 }
 
-/*Catching messages from the Background Script*/
+/*
+  Listen for messages from the background script.
+*/
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "autofill") {
-    const result = autofillCredentials(message.username, message.password);
-    sendResponse(result);
+    autofillCredentials(message.username, message.password).then((result) => {
+      sendResponse(result);
+    });
+    return true;
   }
-  return true; // חייב להחזיר true כדי שההודעה תישלח חזרה בצורה אסינכרונית
-}); 
+});

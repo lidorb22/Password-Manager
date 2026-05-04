@@ -15,10 +15,9 @@ const comparePassword = async (password, hashedPassword) => {
   return isMatch;
 };
 
-const createNewUser = async (firstname, lastname, email, password) => {
+const createNewUser = async (firstname, email, password) => {
   const newUser = new userSchema({
     firstname,
-    lastname,
     email,
     password,
   });

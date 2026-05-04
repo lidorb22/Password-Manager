@@ -39,19 +39,22 @@ const emailValidateRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 */
 
 router.post("/register", async (req, res) => {
-  const { firstname, lastname, email, password } = req.body;
+  const { firstname, email, password } = req.body;
+  
   if (!emailValidateRegex.test(email)) {
     return res.status(400).json({ error: "Invalid email format" });
   }
-   if (!password || password.length < 8) {
-    return res.status(400).json({ error: "Password must be at least 8 characters" });
+   if (!password || password.length != 8) {
+    return res.status(400).json({ error: "Password must be at exactly 8 characters" });
   }
   try {
     /*Hash the master password before saving it to the database*/
     const hashedPassword = await hashPassword(password);
-    const newuser = await createNewUser(firstname, lastname, email, hashedPassword);
+    
+    const newuser = await createNewUser(firstname, email, hashedPassword);
     res.status(200).json(newuser);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -95,6 +98,8 @@ router.post("/login", async (req, res) => {
     res.status(500).json(error);
   }
 });
+
+
 
 //add user verification and autenticate with email code
 

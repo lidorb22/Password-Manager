@@ -29,23 +29,52 @@ const NOTIFICATIONS = {
     icon: "⚠️",
     type: "warning",
   },
+  PASSWORD_GENERATION_ERROR: {
+  message: "Failed to generate a strong password. Please try again.",
+  icon: "⚠️",
+  type: "error",
+  },
+  NO_PASSWORD_GENERATED: {
+  message: "Please generate a password first.",
+  icon: "⚠️",
+  type: "warning",
+  },
+  PASSWORD_COPIED: {
+  message: "Password copied to clipboard",
+  icon: "✓",
+  type: "success",
+  },
+  USERNAME_COPIED: {
+  message: "Username copied to clipboard",
+  icon: "✓",
+  type: "success",
+  },
+  INVALID_MASTER_PASSWORD: {
+  message: "Incorrect master password. Please try again.",
+  icon: "✕",
+  type: "error",
+  },
+  REGISTRATION_FAILED: {
+  message: "Registration failed. The email may already be in use, or the server is unavailable.",
+  icon: "✕",
+  type: "error",
+  },
 };
 
 
 export function useNotification() {
-  /* הודעה שמוצגת כרגע (אם יש)*/
   const [notification, setNotification] = useState({
     message: "",
     icon: "",
     type: "info",
   });
 
-  /*  סגירת ההודעה הנוכחית  */ 
+  /*  Close the current popup  */ 
   const hideNotification = useCallback(() => {
     setNotification({ message: "", icon: "", type: "info" });
   }, []);
 
-  /*הצגת הודעה לפי המפתח שלה */ 
+  /*Display popup by it's key*/ 
   const showNotification = useCallback((key) => {
     const notif = NOTIFICATIONS[key];
     if (notif) setNotification(notif);
