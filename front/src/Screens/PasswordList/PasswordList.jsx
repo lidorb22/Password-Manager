@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import VaultHeader from "./VaultHeader";
 import PasswordItem from "../../components/Vault/PasswordItem/PasswordItem";
 import AddPasswordPopup from "../../components/Vault/Popup/AddPasswordPopup";
 import MasterPasswordPopup from "../../components/Vault/Popup/MasterPasswordPopup";
 import CredentialsPopup from "../../components/Vault/Popup/CredentialsPopup";
+import { decryptPassword } from "../../API/controller";
 import "./PasswordList.css";
 
 /* Main vault screen - shows the user's saved passwords.*/
@@ -38,15 +39,51 @@ function PasswordList({ user, setUser, showNotification }) {
     return account.site.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
-  /* Detect "shared" passwords - same encrypted password used in multiple accounts. */
-  const sharedPasswordSet = new Set();
-  const seenPasswords = new Set();
-  user.accounts.forEach((acc) => {
-    if (seenPasswords.has(acc.password)) {
-      sharedPasswordSet.add(acc.password);
+  /* Detect "shared" passwords by decrypting each one, hashing the plaintext,
+     and comparing hashes. Plaintext is never stored in state. */
+  const [sharedAccountIds, setSharedAccountIds] = useState(new Set());
+
+  useEffect(() => {
+    if (user.accounts.length < 2) {
+      setSharedAccountIds(new Set());
+      return;
     }
-    seenPasswords.add(acc.password);
-  });
+
+    const detect = async () => {
+      const results = await Promise.all(
+        user.accounts.map(async (acc) => {
+          const plaintext = await decryptPassword(user._id, acc.password);
+          const encoded = new TextEncoder().encode(plaintext);
+          const hashBuffer = await crypto.subtle.digest("SHA-256", encoded);
+          const hashHex = Array.from(new Uint8Array(hashBuffer))
+            .map((b) => b.toString(16).padStart(2, "0"))
+            .join("");
+          return { id: acc._id, hash: hashHex };
+        })
+      );
+
+      const hashCount = {};
+      results.forEach(({ hash }) => {
+        hashCount[hash] = (hashCount[hash] || 0) + 1;
+      });
+
+      const duplicateHashes = new Set(
+        Object.entries(hashCount)
+          .filter(([, count]) => count > 1)
+          .map(([hash]) => hash)
+      );
+
+      setSharedAccountIds(
+        new Set(
+          results
+            .filter(({ hash }) => duplicateHashes.has(hash))
+            .map(({ id }) => id)
+        )
+      );
+    };
+
+    detect();
+  }, [user.accounts]);
 
 
   /* ============================================================
@@ -135,7 +172,7 @@ function PasswordList({ user, setUser, showNotification }) {
               <PasswordItem
                 key={account._id || `${account.site}-${account.username}`}
                 account={account}
-                isShared={sharedPasswordSet.has(account.password)}
+                isShared={sharedAccountIds.has(account._id)}
                 onView={handleViewPassword}
               />
             ))
