@@ -1,0 +1,81 @@
+/*  Backdrop - covers the entire viewport with a blur effect.*/
+.popup-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Stronger blur + dark overlay - clearly separates the popup*/
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.4);
+  /* Smooth fade-in when the popup opens */
+  animation: popup-backdrop-fade-in var(--transition-base) ease-out;
+}
+
+/* The white popup box itself.*/
+.popup-box {
+  position: relative;
+  width: 92%;
+  max-width: 520px;
+  max-height: 90vh;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-2xl);
+  padding: var(--space-8);
+  overflow-y: auto;
+  animation: popup-box-pop-in var(--transition-base) ease-out;
+}
+
+/* Close button (X) in the top-right corner.*/
+.popup-close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  background: none;
+  border: none;
+  padding: var(--space-2);
+  cursor: pointer;
+  color: var(--gray-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.popup-close:hover {
+  background: var(--gray-100);
+  color: var(--gray-800);
+}
+
+.popup-close:active {
+  transform: scale(0.95);
+}
+
+/* ANIMATIONS - smooth entry when the popup opens */
+
+@keyframes popup-backdrop-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popup-box-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

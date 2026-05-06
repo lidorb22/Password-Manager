@@ -1,4 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import Notification from "./components/Notification/Notification";
+import Card from "./components/Card/Card";
+import Welcome from "./Screens/Welcome/Welcome";
+import Login from "./Screens/Login/Login";
+import Register from "./Screens/Register/Register";
+import PasswordList from "./Screens/PasswordList/PasswordList";
+import { useNotification } from "./hooks/useNotification";
 import {
   generatePassword,
   isStrongPassword,
@@ -6,109 +13,118 @@ import {
 } from "./passwordHelpers";
 
 function App() {
-  // --- States (ניהול זיכרון האפליקציה) ---
-  const [currentPassword, setCurrentPassword] = useState(""); // שומר את הסיסמה שנוצרה
+  /* Current screen state - controls which screen is shown */
+  const [currentScreen, setCurrentScreen] = useState("welcome");
 
-  // --- Handlers (הפונקציות שמגיבות ללחיצות כפתור) ---
+  /* Logged-in user data - set after successful login */
+  const [currentUser, setCurrentUser] = useState(null);
 
-  // פונקציה לייצור סיסמה חזקה
-  const handleGenerateClick = () => {
-    const newPass = generatePassword();
-    // וולידציה - מוודאים שהסיסמה באמת חזקה לפני שמציגים אותה
-    if (isStrongPassword(newPass)) {
-      setCurrentPassword(newPass);
-    } else {
-      alert("שגיאה פנימית בייצור סיסמה, נסה שוב");
+  /* Currently generated password - will be used in passwords list screen */
+  const [currentPassword, setCurrentPassword] = useState("");
+
+  /* Pop-up notification management */
+  const { notification, hideNotification, showNotification } = useNotification();
+
+  /* 
+    Redirect and autofill function
+    Sends a message to the Background Script to open the website and fill in the credentials
+    Should be called from the passwords list component
+  */
+  // eslint-disable-next-line no-unused-vars
+  const redirectAndAutofill = async (link, username, password) => {
+    try {
+      await chrome.runtime.sendMessage({
+        action: "redirectAndAutofill",
+        link,
+        username,
+        password,
+      });
+    } catch (error) {
+      console.error("Message error:", error);
+      showNotification("SERVER_ERROR");
     }
   };
 
-  // פונקציה להזרקת הסיסמה ישירות לשדה באתר
+  /* 
+    Generate a strong password
+    Will be wired to a button in the passwords list / add password screen
+  */
+  // eslint-disable-next-line no-unused-vars
+  const handleGenerateClick = () => {
+    const newPass = generatePassword();
+    if (isStrongPassword(newPass)) {
+      setCurrentPassword(newPass);
+    } else {
+      showNotification("PASSWORD_GENERATION_ERROR");
+    }
+  };
+
+  /* 
+    Inject the current password into the active page's password field
+    Will be wired to a button in the passwords list / add password screen
+  */
+  // eslint-disable-next-line no-unused-vars
   const handleInjectClick = () => {
     if (!currentPassword) {
-      alert("קודם תייצר סיסמה!");
+      showNotification("NO_PASSWORD_GENERATED");
       return;
     }
     injectPasswordToPage(currentPassword);
   };
 
-  // --- UI (מה שהמשתמש רואה) ---
   return (
-    <div
-      style={{
-        padding: "15px",
-        textAlign: "center",
-        width: "300px",
-        fontFamily: "Arial",
-        direction: "rtl",
-      }}
-    >
-      <h2 style={{ color: "#333", marginBottom: "5px" }}>Password Manager</h2>
+    <Card>
+      {/* Pop-up notification - shown at top of screen when active */}
+      <Notification
+        message={notification.message}
+        icon={notification.icon}
+        type={notification.type}
+        onClose={hideNotification}
+      />
 
-      {/* תיבת הצגת הסיסמה */}
-      <div
-        style={{
-          backgroundColor: "#f4f4f4",
-          padding: "15px",
-          borderRadius: "8px",
-          border: "1px solid #ddd",
-          marginBottom: "15px",
-        }}
-      >
-        <p style={{ margin: "0 0 5px 0", fontSize: "12px", color: "#666" }}>
-          סיסמה שנוצרה:
-        </p>
-        <strong
-          style={{
-            fontSize: "20px",
-            letterSpacing: "2px",
-            color: "#222",
-            wordBreak: "break-all",
+      {/* Show Welcome screen */}
+      {currentScreen === "welcome" && (
+        <Welcome
+          onCreateAccount={() => setCurrentScreen("register")}
+          onSignIn={() => setCurrentScreen("login")}
+        />
+      )}
+
+      {/* Show Login screen */}
+      {currentScreen === "login" && (
+        <Login
+          onBack={() => setCurrentScreen("welcome")}
+          onLoginSuccess={(userData) => {
+            setCurrentUser(userData);
+            setCurrentScreen("passwords");
           }}
-        >
-          {currentPassword || "--------"}
-        </strong>
-      </div>
+          showNotification={showNotification}
+        />
+      )}
 
-      {/* כפתורי פעולה */}
-      <button
-        onClick={handleGenerateClick}
-        style={{
-          backgroundColor: "#4CAF50",
-          color: "white",
-          width: "100%",
-          padding: "12px",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-          marginBottom: "10px",
-          fontWeight: "bold",
-          fontSize: "14px",
-        }}
-      >
-        ייצר סיסמה חזקה
-      </button>
+      {/* Show Register screen */}
+      {currentScreen === "register" && (
+        <Register
+          onBack={() => setCurrentScreen("welcome")}
+          onRegisterSuccess={(userData) => {
+            setCurrentUser(userData);
+            setCurrentScreen("passwords");
+          }}
+          showNotification={showNotification}
+        />
+      )}
 
-      <button
-        onClick={handleInjectClick}
-        style={{
-          backgroundColor: "#2196F3",
-          color: "white",
-          width: "100%",
-          padding: "12px",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-          fontWeight: "bold",
-          fontSize: "14px",
-        }}
-      >
-        הזרק סיסמה לדף
-      </button>
+      {/* Show Passwords List screen */}
+      {currentScreen === "passwords" && currentUser && (
+        <PasswordList
+           user={currentUser}
+           setUser={setCurrentUser}
+           showNotification={showNotification}
+        />
+      )}
 
-      <p style={{ fontSize: "10px", marginTop: "15px", color: "#999" }}>
-        * הסיסמה תישמר אוטומטית בשרת בעת לחיצה על כפתור התחברות באתר.
-      </p>
-    </div>
+
+    </Card>
   );
 }
 

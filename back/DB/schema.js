@@ -9,17 +9,17 @@ const userSchema = new mongoose.Schema(
       trim: true, // מנקה רווחים מיותרים מהצדדים
       minlength: 2, // אורך מינימלי
     },
-    lastname: {
-      type: String,
-      required: [true, "Please provide a last name"], // חובה + הודעת שגיאה מותאמת
-      minlength: 2, // אורך מינימלי
-    },
     email: {
       type: String,
       required: true,
       unique: true,
       trim: true,
       lowercase: true, // שומר הכל באותיות קטנות
+    },
+    password: {
+      type: String,
+      required: [true, "Please provide a master password"],
+      minlength: 8,
     },
     accounts: {
       type: [

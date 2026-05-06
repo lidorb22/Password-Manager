@@ -1,0 +1,94 @@
+@import "../../styles/theme.css";
+
+/* הודעה קופצת*/
+.notification {
+  position: fixed;
+  top: var(--space-5);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 280px;
+  max-width: 90%;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-family);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-medium);
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  animation: slideDown var(--transition-base) ease-out;
+  backdrop-filter: blur(10px);
+}
+
+/* צבעים לפי סוג ההודעה */
+.notification-success {
+  background-color: var(--success-50);
+  color: var(--success-600);
+  border: 1px solid var(--success-400);
+}
+
+.notification-error {
+  background-color: var(--error-50);
+  color: var(--error-500);
+  border: 1px solid var(--error-400);
+}
+
+.notification-warning {
+  background-color: var(--warning-50);
+  color: var(--warning-700);
+  border: 1px solid var(--warning-200);
+}
+
+.notification-info {
+  background-color: var(--purple-50);
+  color: var(--purple-800);
+  border: 1px solid var(--purple-200);
+}
+
+/* אייקון בצד */
+.notification-icon {
+  font-size: var(--font-xl);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+/* טקסט ההודעה */
+.notification-message {
+  flex-grow: 1;
+  line-height: 1.4;
+}
+
+/* כפתור הסגירה */
+.notification-close {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: var(--font-sm);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  opacity: 0.6;
+  transition: opacity var(--transition-fast), background-color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.notification-close:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* אנימציה של כניסה מלמעלה */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

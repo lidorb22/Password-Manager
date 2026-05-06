@@ -1,0 +1,83 @@
+/* Container for the entire field (label + input + error message) */
+.textfield {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+/* Label above the input */
+.textfield-label {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--gray-800);
+}
+
+/* Wrapper holds the input and any icons together */
+.textfield-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-4);
+  background: var(--white);
+  border: 2px solid var(--purple-200);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-base);
+}
+
+/* Highlight border on focus */
+.textfield-wrapper:focus-within {
+  border-color: var(--purple-400);
+}
+
+/* Red border when there's an error */
+.textfield-error {
+  border-color: var(--error-500);
+}
+
+/* Left icon ( user, email icon) */
+.textfield-icon {
+  display: flex;
+  align-items: center;
+  color: var(--gray-400);
+  font-size: var(--font-lg);
+}
+
+/* The input itself, no border, fills the wrapper */
+.textfield-input {
+  flex: 1;
+  padding: var(--space-3) 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--font-family);
+  font-size: var(--font-base);
+  color: var(--gray-800);
+}
+
+.textfield-input::placeholder {
+  color: var(--gray-400);
+}
+
+/* Right icon as a clickable button (eye icon) */
+.textfield-right-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2);
+  color: var(--gray-400);
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.textfield-right-icon:hover {
+  color: var(--purple-400);
+  background-color: var(--purple-50);
+}
+
+/* Error message below the field */
+.textfield-error-message {
+  font-size: var(--font-xs);
+  color: var(--error-500);
+   font-weight: var(--weight-medium);
+}
