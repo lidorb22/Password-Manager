@@ -2,6 +2,32 @@
   Background Service Worker
 */
 
+import { createAccount } from "../API/controller";
+
+// ==========================================
+// Password Manager - Background Script
+// השליח שאחראי על התקשורת מול ה-Backend
+// ==========================================
+
+// פונקציה 1: ביצוע השליחה הפיזית לשרת דרך API
+//need to change the id to be dynamic and not hardcoded
+const postDataToServer = async (payload) => {
+  createAccount({ ...payload, id: "69fb6c39c2841878f14a1061" });
+};
+
+// פונקציה 2: האזנה להודעות שמגיעות מה-Content Script (המרגל)
+const listenToMessages = () => {
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    // בודק אם קיבלנו הודעה עם תגית לשמירת נתונים
+    if (request.action === "SAVE_CREDENTIALS") {
+      // מפעיל את פונקציית השליחה לשרת
+      postDataToServer(request.data);
+    }
+  });
+};
+
+// הפעלת המאזין ברגע שהתוסף נדלק
+listenToMessages();
 
 async function redirectAndAutofill(link, username, password) {
   try {
@@ -32,7 +58,7 @@ async function redirectAndAutofill(link, username, password) {
           } else {
             resolve(response);
           }
-        }
+        },
       );
     });
 
@@ -78,7 +104,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     redirectAndAutofill(message.link, message.username, message.password).then(
       (result) => {
         sendResponse(result);
-      }
+      },
     );
 
     return true;

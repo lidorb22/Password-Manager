@@ -1,4 +1,5 @@
 import { showInPageNotification } from "./inPageNotification.js";
+import "./inPageNotification.css";
 
 /*
   Content Script
@@ -89,11 +90,10 @@ async function findFieldsWithRetry(maxAttempts = 5, delayMs = 500) {
   };
 }
 
-
 function fillField(field, value) {
   const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
     window.HTMLInputElement.prototype,
-    "value"
+    "value",
   ).set;
   nativeInputValueSetter.call(field, value);
 
@@ -102,7 +102,6 @@ function fillField(field, value) {
   field.dispatchEvent(new Event("change", { bubbles: true }));
   field.focus();
 }
-
 
 async function autofillCredentials(username, password) {
   /* Try to find both fields, with retry for slow-loading forms */
@@ -113,7 +112,7 @@ async function autofillCredentials(username, password) {
     showInPageNotification(
       "Could not find a password field on this page",
       "✕",
-      "error"
+      "error",
     );
     return {
       success: false,
@@ -129,7 +128,7 @@ async function autofillCredentials(username, password) {
     showInPageNotification(
       "Password filled, but no username field was found. You may need to enter your username manually.",
       "⚠",
-      "warning"
+      "warning",
     );
     return {
       success: true,
@@ -137,12 +136,12 @@ async function autofillCredentials(username, password) {
       filledPassword: true,
     };
   }
-  
+
   fillField(usernameField, username);
   showInPageNotification(
     "Login details filled in successfully",
     "✓",
-    "success"
+    "success",
   );
 
   return {
@@ -163,3 +162,55 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 });
+
+async function extractData() {
+  // מחפש את כל ה-inputs בדף
+  const inputs = document.querySelectorAll("input");
+  let data = {
+    site: window.location.hostname,
+    link: window.location.href,
+    username: "",
+    password: "",
+  };
+
+  inputs.forEach((input) => {
+    // אם זה שדה סיסמה
+    if (input.type === "password") {
+      data.password = input.value;
+      // מנסה למצוא את השם משתמש שלפניו
+      const prevInput = input
+        .closest("form")
+        ?.querySelector('input[type="text"], input[type="email"]');
+      if (prevInput) data.username = prevInput.value;
+    }
+  });
+
+  // אם לא מצאנו דרך ה-form, ניקח כל מה שיש בשדות הטקסט
+  if (!data.username) {
+    const emailInput = document.querySelector(
+      'input[type="text"], input[type="email"]',
+    );
+    if (emailInput) data.username = emailInput.value;
+  }
+
+  if (data.username || data.password) {
+    chrome.runtime.sendMessage({ action: "SAVE_CREDENTIALS", data: data });
+  }
+}
+
+// מאזין לכל לחיצה על כפתור התחברות
+document.addEventListener(
+  "click",
+  (e) => {
+    const target = e.target;
+    // מחפש לחיצה על כפתור או משהו שמתנהג כמו כפתור
+    if (
+      target.closest("button") ||
+      target.closest('[role="button"]') ||
+      target.closest('input[type="submit"]')
+    ) {
+      extractData();
+    }
+  },
+  true,
+);

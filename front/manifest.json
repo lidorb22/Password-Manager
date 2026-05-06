@@ -15,7 +15,6 @@
     {
       "matches": ["<all_urls>"],
       "js": ["src/content/autofill.js"],
-      "css": ["src/content/inPageNotification.css"],
       "run_at": "document_idle"
     }
   ],

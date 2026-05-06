@@ -10,19 +10,12 @@ export default defineConfig({
     strictPort: true,
     hmr: {
       host: "localhost",
+      protocol: "ws",
     },
   },
   plugins: [
     react(),
     crx({ manifest }),
-     /*Copies the content script CSS to the dist folder*/
-    viteStaticCopy({
-      targets: [
-        {
-          src: "src/content/inPageNotification.css",
-          dest: ".",
-        },
-      ],
-    }),
+    /*Copies the content script CSS to the dist folder*/
   ],
 });
